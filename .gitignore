@@ -10,5 +10,4 @@ node_modules/
 logs/
 deploy/
 deploy.tar.gz
-dist/
 *.log
