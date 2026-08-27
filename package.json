@@ -1,0 +1,28 @@
+{
+  "name": "web_hooks",
+  "version": "1.0.0",
+  "description": "webHook相关的工作，目前有微信公众号..",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "lint": "eslint .",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lmliheng/web_hooks.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/lmliheng/web_hooks/issues"
+  },
+  "homepage": "https://github.com/lmliheng/web_hooks#readme",
+  "dependencies": {
+    "@lmliheng/agent": "^1.0.4",
+    "express": "^5.2.1"
+  }
+}
