@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express'
 
 import { router } from './router/Auth.js'
@@ -16,8 +17,12 @@ app.get('/health', (req, res) => {
 
 async function startServer() {
     const PORT = process.env.PORT || 7000;
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
         console.log(`服务器运行在端口 ${PORT}`);
+    });
+    server.on('error', (err) => {
+        console.error('服务器启动失败:', err);
+        process.exit(1);
     });
 }
 

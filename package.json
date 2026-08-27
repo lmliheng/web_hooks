@@ -2,12 +2,12 @@
   "name": "web_hooks",
   "version": "1.0.0",
   "description": "webHook相关的工作，目前有微信公众号..",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
     "lint": "eslint .",
-    "test": "jest"
+    "test": "node --test test/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,14 @@
   "homepage": "https://github.com/lmliheng/web_hooks#readme",
   "dependencies": {
     "@lmliheng/agent": "^1.0.4",
+    "axios": "^1.20.0",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.9.1",
+    "globals": "^17.11.0",
+    "nodemon": "^3.1.14"
   }
 }

@@ -33,10 +33,10 @@ jobs:
         run: npm ci
       
       - name: Run linting
-        run: npm run lint || true
+        run: npm run lint
       
       - name: Run tests
-        run: npm test || echo "No tests configured"
+        run: npm test
 
   # 部署任务
   deploy:
@@ -56,12 +56,13 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
       
       - name: Install dependencies
-        run: npm ci --production
+        # 全量安装（含 nodemon 等 devDependencies），部署包内的 npx nodemon 才能运行
+        run: npm ci
       
       - name: Create deployment package
         run: |
           mkdir -p deploy
-          cp -r node_modules dist src package.json package-lock.json deploy/
+          cp -r node_modules app.js router ecosystem.config.cjs package.json package-lock.json deploy/
           cd deploy && tar czf ../deploy.tar.gz .
       
       - name: Deploy to server via SSH
@@ -89,21 +90,24 @@ jobs:
             tar xzf deploy.tar.gz
             rm deploy.tar.gz
             
-            # 创建或更新 .env 文件
-            cat > .env << EOF
+            # 创建或更新 .env 文件（app.js 通过 dotenv 自动加载）
+            cat > .env << 'EOF'
             PORT=${{ secrets.PORT || 3000 }}
             WECHAT_TOKEN=${{ secrets.WECHAT_TOKEN }}
             NODE_ENV=production
             EOF
             
-            # 停止旧服务
-            pm2 stop wechat-service 2>/dev/null || true
+            # 日志目录
+            mkdir -p logs
             
-            # 启动新服务
-            pm2 start app.js --name wechat-service --update-env
+            # 停止旧进程（用变量拼进程名，避免 pkill 误杀执行脚本自身）
+            APP="app.js"
+            pkill -f "nodemon ${APP}" 2>/dev/null || true
+            pkill -f "node ${APP}" 2>/dev/null || true
+            sleep 1
             
-            # 保存 PM2 进程列表以便开机自启
-            pm2 save
+            # 后台启动 nodemon（ssh 断开后仍运行，日志写入 logs/out.log）
+            nohup npx --no-install nodemon ${APP} </dev/null >> logs/out.log 2>&1 &
 
   # 通知任务（可选）
   notify:
