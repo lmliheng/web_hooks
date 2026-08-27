@@ -37,6 +37,9 @@ jobs:
       
       - name: Run tests
         run: npm test
+      
+      - name: Build bundle
+        run: npm run build
 
   # 部署任务
   deploy:
@@ -56,13 +59,15 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
       
       - name: Install dependencies
-        # 全量安装（含 nodemon 等 devDependencies），部署包内的 npx nodemon 才能运行
         run: npm ci
+      
+      - name: Build bundle
+        run: npm run build
       
       - name: Create deployment package
         run: |
           mkdir -p deploy
-          cp -r node_modules app.js router ecosystem.config.cjs package.json package-lock.json deploy/
+          cp -r dist package.json deploy/
           cd deploy && tar czf ../deploy.tar.gz .
       
       - name: Deploy to server via SSH
@@ -90,7 +95,7 @@ jobs:
             tar xzf deploy.tar.gz
             rm deploy.tar.gz
             
-            # 创建或更新 .env 文件（app.js 通过 dotenv 自动加载）
+            # 创建或更新 .env 文件（打包文件内的 dotenv 会自动加载）
             cat > .env << 'EOF'
             PORT=${{ secrets.PORT || 3000 }}
             WECHAT_TOKEN=${{ secrets.WECHAT_TOKEN }}
@@ -101,13 +106,12 @@ jobs:
             mkdir -p logs
             
             # 停止旧进程（用变量拼进程名，避免 pkill 误杀执行脚本自身）
-            APP="app.js"
-            pkill -f "nodemon ${APP}" 2>/dev/null || true
-            pkill -f "node ${APP}" 2>/dev/null || true
+            APP="app.mjs"
+            pkill -f "dist/${APP}" 2>/dev/null || true
             sleep 1
             
-            # 后台启动 nodemon（ssh 断开后仍运行，日志写入 logs/out.log）
-            nohup npx --no-install nodemon ${APP} </dev/null >> logs/out.log 2>&1 &
+            # 后台启动打包文件（ssh 断开后仍运行，日志写入 logs/out.log）
+            nohup node dist/${APP} </dev/null >> logs/out.log 2>&1 &
 
   # 通知任务（可选）
   notify:
