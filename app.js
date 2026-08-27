@@ -1,12 +1,14 @@
 import 'dotenv/config'
 import express from 'express'
 
-import { router } from './router/Auth.js'
+import { router } from './router/Wx.js'
 
 const app = express()
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// 微信消息回调是 XML（content-type: text/xml 等），按原始文本接收
+app.use(express.text({ type: ['text/xml', 'application/xml', 'text/plain'] }));
 
 app.use('/', router)
 
