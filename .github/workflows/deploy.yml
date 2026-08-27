@@ -11,9 +11,8 @@ on:
 # 环境变量
 env:
   NODE_VERSION: '18'
-  DEPLOY_PATH: '/var/www/wechat-service',
+  DEPLOY_PATH: '/var/www/wechat-service'
   
-
 jobs:
   # 测试任务
   test:

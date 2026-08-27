@@ -8,7 +8,7 @@ router.get('/wx', async (req, res) => {
         // 这个是写在环境变量里的
         let token = process.env.token || 'liheng'
         const { signature, timestamp, nonce, echostr } = req.query
-        let res = AuthWithServer(signature, timestamp, nonce, echostr)
+        let res = AuthWithServer(signature, timestamp, nonce, echostr, token)
         if (res) {
             res.send(echostr)
         }
